@@ -62,7 +62,7 @@
     }
     @media (max-width: 900px){ .main{grid-template-columns:1fr} }
 
-    /* 左侧：乌萨奇&小八（贴纸版） */
+    /* 左侧：贴纸区（稳定版：不会因为太大而“炸”） */
     .sticker{
       width:100%;
       aspect-ratio: 1 / 1;
@@ -83,14 +83,16 @@
       box-shadow: 0 8px 18px rgba(0,0,0,.07);
       white-space:pre-line;
       max-width:80%;
+      z-index:2;
     }
     .chars{
       position:absolute; inset:0;
       display:flex;
       align-items:flex-end;
       justify-content:space-around;
-      padding:60px 18px 16px; /* 往下挪，避免被气泡挡 */
-      gap:14px;
+      padding:64px 16px 16px; /* 确保不会顶到气泡 */
+      gap:12px;
+      z-index:1;
     }
     .c{
       width:48%;
@@ -102,21 +104,27 @@
       align-items:center;
       justify-content:center;
       position:relative;
+      overflow:hidden; /* 防止图片撑爆 */
     }
     .stImg{
       width:100%;
       height:100%;
       object-fit:contain;
-      transform: scale(1.22);          /* 放大：想更大就 1.28 / 1.32 */
-      transform-origin: center bottom;
+      /* 先不缩放，确保“必显示”。你想更大再加 scale */
+      transform:none;
       pointer-events:none;
     }
+    /* 如果你确认能显示了，再把下面这行解除注释来放大一点：
+    .stImg{ transform: scale(1.18); transform-origin:center bottom; }
+    */
+
     .tag{
       position:absolute; bottom:10px; left:50%;
       transform:translateX(-50%);
       font-size:12px; color:var(--muted);
       background:#ffffffd9; border:1px solid var(--border);
       border-radius:999px; padding:6px 10px;
+      z-index:3;
     }
     .shake{animation: shake .28s ease-in-out 1}
     @keyframes shake{
@@ -184,8 +192,6 @@
       border-color:#ff000022;
       background: linear-gradient(180deg,#fff,#fff3f6);
     }
-
-    /* 角落小按钮：一点都不想 */
     .tiny-corner{
       position:absolute;
       right:12px;
@@ -196,7 +202,6 @@
       opacity:.85;
     }
 
-    /* 文字闪烁提示 */
     .flash{
       position:absolute;
       inset:auto 0 56px 0;
@@ -212,7 +217,6 @@
     @keyframes pop{ from{transform:translateY(6px); opacity:0} to{transform:translateY(0); opacity:1} }
     @keyframes blink{ 0%,100%{opacity:.2} 50%{opacity:1} }
 
-    /* 音频区（赖床线用） */
     .audioBox{
       margin-top:12px;
       border:1px dashed var(--border);
@@ -225,7 +229,6 @@
     }
     audio{width:100%; margin-top:8px;}
 
-    /* 小小的温柔署名（可删） */
     .footer{
       padding:12px 14px;
       border-top:1px solid var(--border);
@@ -242,7 +245,7 @@
 <body>
   <div class="wrap">
     <div class="top">
-      <div class="pill">💗 Ranni宝宝流程站</div>
+      <div class="pill">💗 Ranni宝宝</div>
       <div class="pill" id="today"></div>
       <div class="pill">乌萨奇 & 小八：在盯你</div>
     </div>
@@ -251,19 +254,17 @@
       <div class="main">
         <div>
           <div class="sticker" id="sticker">
-            <div class="st-bubble" id="stBubble">Ranni宝宝～起床了吗？\n（小八举手：我来问！）</div>
+            <div class="st-bubble" id="stBubble">Ranni宝宝～起床了吗？\n（小八：我来问！）</div>
 
-            <!-- ✅ 贴纸文件放在仓库 assets/ 目录：
-                 assets/hachi.webp
-                 assets/usagi.webp -->
             <div class="chars">
               <div class="c">
-                <img class="stImg" src="assets/hachi.webp" alt="小八">
+                <!-- ✅ 注意：文件必须在仓库 assets/ 里，且大小写一致 -->
+                <img class="stImg" src="assets/hachi.webp?v=2" alt="小八" loading="lazy">
                 <div class="tag">小八</div>
               </div>
 
               <div class="c" style="background:#fff7ef">
-                <img class="stImg" src="assets/usagi.webp" alt="乌萨奇">
+                <img class="stImg" src="assets/usagi.webp?v=2" alt="乌萨奇" loading="lazy">
                 <div class="tag">乌萨奇</div>
               </div>
             </div>
@@ -290,23 +291,14 @@
   </div>
 
 <script>
-  /** ==========================
-   *  配置（可选）
-   *  ========================== */
-
-  // Webhook：她点“想/特别想”时会 POST 通知到你（不想用就留空）
+  // 可选：Webhook（不用就留空）
   const NOTIFY_URL = "";
-
-  // 赖床分支音频（你有权限的音频 URL）
+  // 赖床音频（不用就留空）
   const SWIM_AUDIO_URL = "";
-
-  // 备用联系：复制一段话 + 尝试打开微信
+  // 复制消息 + 尝试打开微信
   const SOURCE_NAME = "源";
   const WECHAT_OPEN_SCHEME = "weixin://";
 
-  /** ==========================
-   *  工具函数
-   *  ========================== */
   const $ = (s)=>document.querySelector(s);
   const sticker = $("#sticker");
   const stBubble = $("#stBubble");
@@ -351,7 +343,6 @@
     optionsEl.innerHTML = "";
     cornerEl.innerHTML = "";
   }
-
   async function copyToClipboard(text){
     try{
       await navigator.clipboard.writeText(text);
@@ -376,18 +367,14 @@
       from: "Ranni site"
     };
 
-    let webhookOk = false;
     if(NOTIFY_URL){
       try{
-        const res = await fetch(NOTIFY_URL, {
+        await fetch(NOTIFY_URL, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
           body: JSON.stringify(payload)
         });
-        webhookOk = res.ok;
-      }catch(e){
-        webhookOk = false;
-      }
+      }catch(e){}
     }
 
     const msg = `Ranni：我${level}你了💗（${hm()}）`;
@@ -395,7 +382,6 @@
 
     try{ window.location.href = WECHAT_OPEN_SCHEME; }catch(e){}
 
-    // 不要“技术提示”，改成恋爱口吻
     dialogEl.textContent =
 `我收到了～💗
 现在回微信给${SOURCE_NAME}发一句就好：
@@ -416,9 +402,6 @@
     return b;
   }
 
-  /** ==========================
-   *  状态机
-   *  ========================== */
   let state = "start";
   let dontWantClicks = 0;
 
@@ -489,7 +472,6 @@
         audio.src = SWIM_AUDIO_URL;
         box.appendChild(audio);
       }else{
-        // 没配置音频就不出现“开发提示”
         box.innerHTML = `<b>那我们游一会儿～</b><br/>（先不放歌也可以～你赖一会儿也行。）`;
       }
 
@@ -519,4 +501,19 @@
     clearUI();
     titleEl.textContent = "不许";
     subEl.textContent = "角落按钮已被没收。";
+    dialogEl.textContent = "必须想！现在选一个：";
+    optionsEl.appendChild(btn("想", ()=>notifySource("想"), "primary"));
+    optionsEl.appendChild(btn("特别想", ()=>notifySource("特别想"), "primary"));
+  }
+
+  function go(next){
+    state = next;
+    render();
+  }
+
+  render();
+</script>
+</body>
+</html>
+
 
