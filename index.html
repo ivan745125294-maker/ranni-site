@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>宝宝提醒站（乌萨奇&小八）</title>
+  <style>
+    :root{
+      --bg:#f6fbff;
+      --ink:#1f1f1f;
+      --muted:#666;
+      --card:#ffffffd9;
+      --border:#00000014;
+      --shadow:0 10px 26px rgba(0,0,0,.08);
+      --r:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC","Microsoft Yahei", Arial;
+      background:
+        radial-gradient(900px 520px at 15% 10%, #fff7fb, transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, #e9f6ff, transparent 60%),
+        linear-gradient(180deg,#fff,var(--bg));
+      color:var(--ink);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .app{
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      .app{grid-template-columns: 1fr}
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .head{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:#ffffffb3;
+    }
+    .head .t{
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      padding:7px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:#fff;
+      user-select:none;
+    }
+
+    /* 左侧：人物/彩蛋 */
+    .left{padding:14px 14px 16px}
+    .title{
+      margin:6px 0 8px;
+      font-size:22px;
+      font-weight:900;
+    }
+    .desc{
+      margin:0 0 12px;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+    .sticker{
+      width:100%;
+      aspect-ratio: 1 / 1;
+      border-radius:22px;
+      border:1px solid var(--border);
+      background: radial-gradient(240px 240px at 28% 20%, #fff, #f2fbff);
+      box-shadow: 0 12px 28px rgba(0,0,0,.08);
+      position:relative;
+      overflow:hidden;
+    }
+    .bubble{
+      position:absolute; top:14px; left:14px;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:10px 12px;
+      font-weight:800;
+      box-shadow: 0 8px 18px rgba(0,0,0,.07);
+      white-space:pre-line;
+    }
+    .chars{
+      position:absolute; inset:0;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-around;
+      padding:26px 18px 16px;
+      gap:14px;
+    }
+    .c{
+      width:45%;
+      height:58%;
+      border-radius:22px;
+      border:1px solid var(--border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .face{
+      width:74%;
+      height:74%;
+      border-radius:20px;
+      border:1px solid var(--border);
+      position:relative;
+      background: linear-gradient(180deg,#fff, #fafafa);
+    }
+    .ear{
+      position:absolute; width:34%; height:30%;
+      border:1px solid var(--border);
+      border-radius:14px; top:-10%; background:#fff;
+    }
+    .ear.l{left:6%} .ear.r{right:6%}
+    .eye{position:absolute; top:42%; width:10px; height:14px; background:#222; border-radius:10px;}
+    .eye.l{left:28%} .eye.r{right:28%}
+    .mouth{
+      position:absolute; top:62%; left:50%;
+      width:22px; height:10px;
+      border:2px solid #222;
+      border-top:none; border-left:none; border-right:none;
+      transform:translateX(-50%);
+      border-radius:0 0 999px 999px;
+    }
+    .tag{
+      position:absolute; bottom:10px; left:50%;
+      transform:translateX(-50%);
+      font-size:12px; color:var(--muted);
+      background:#ffffffd9; border:1px solid var(--border);
+      border-radius:999px; padding:6px 10px;
+    }
+    .spark{position:absolute; right:14px; bottom:14px; display:flex; gap:6px; opacity:.9;}
+    .dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--border);background:#fff; animation: float 2.2s ease-in-out infinite;}
+    .dot:nth-child(2){animation-delay:.25s} .dot:nth-child(3){animation-delay:.5s}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .shake{animation: shake .28s ease-in-out 1}
+    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+
+    .panel{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      border:1px dashed var(--border);
+      background:#ffffffb3;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    button{
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:14px;
+      cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease;
+      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+    }
+    button:hover{box-shadow:0 10px 24px rgba(0,0,0,.10)}
+    button:active{transform:translateY(1px) scale(.99)}
+    .primary{background:linear-gradient(180deg,#fff,#f1fbff); border-color:#00000012;}
+    .mini{
+      margin-top:10px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      font-size:12px; color:var(--muted);
+    }
+    .kpi{
+      padding:7px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:#fff;
+    }
+
+    /* 右侧：聊天区 */
+    .chat{
+      display:flex;
+      flex-direction:column;
+      height: min(720px, 80vh);
+    }
+    .chatbox{
+      padding:14px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .line{
+      display:flex;
+      gap:8px;
+      align-items:flex-end;
+    }
+    .line.me{justify-content:flex-end}
+    .avatar{
+      width:34px;height:34px;border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;
+      flex:0 0 auto;
+    }
+    .bubble2{
+      max-width:min(520px, 78%);
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:#fff;
+      line-height:1.6;
+      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+      white-space:pre-line;
+    }
+    .me .bubble2{
+      background: linear-gradient(180deg,#fff,#f7fffa);
+    }
+    .meta{
+      font-size:11px;
+      color:var(--muted);
+      margin: 2px 8px 0;
+    }
+    .composer{
+      border-top:1px solid var(--border);
+      padding:12px 14px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      background:#ffffffb3;
+      flex-wrap:wrap;
+    }
+    .composer .hint{color:var(--muted); font-size:12px}
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    .foot{
+      padding:12px 14px;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:12px;
+      background:#ffffffb3;
+    }
+    a{color:inherit}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <div class="head">
+        <div class="t">💗 宝宝提醒站</div>
+        <div class="pill" id="today"></div>
+      </div>
+      <div class="left">
+        <div class="title">乌萨奇&小八：今日巡逻</div>
+        <p class="desc">
+          这个页面只做三件事：<b>叫你起床</b>、<b>提醒你吃饭</b>、<b>让你记得想我</b>。
+          你点一下，右边就会像聊天一样弹出消息；她也可以点“我起床了/我吃饭了/我也想你”来回你。
+        </p>
+
+        <div class="sticker" id="sticker">
+          <div class="bubble" id="stickerBubble">宝宝～起床了吗？\n（小八举手：我来问！）</div>
+          <div class="chars">
+            <div class="c">
+              <div class="face">
+                <div class="ear l"></div><div class="ear r"></div>
+                <div class="eye l"></div><div class="eye r"></div>
+                <div class="mouth"></div>
+              </div>
+              <div class="tag">小八</div>
+            </div>
+            <div class="c" style="background:#fff7ef">
+              <div class="face" style="background:linear-gradient(180deg,#fff7ef,#fff)">
+                <div class="ear l" style="background:#fff7ef"></div>
+                <div class="ear r" style="background:#fff7ef"></div>
+                <div class="eye l"></div><div class="eye r"></div>
+                <div class="mouth"></div>
+              </div>
+              <div class="tag">乌萨奇</div>
+            </div>
+          </div>
+          <div class="spark" aria-hidden="true">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="row">
+            <button class="primary" id="wake">🛎️ 起床了吗</button>
+            <button id="eat">🍚 记得吃饭</button>
+            <button id="miss">💭 记得想我</button>
+            <button id="combo">✨ 一键全套</button>
+            <button id="clear">🧼 清空聊天</button>
+          </div>
+          <div class="mini">
+            <div class="kpi">今天「想我」次数：<b id="kMiss">0</b></div>
+            <div class="kpi">她的回执：<b id="kAck">暂无</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card chat">
+      <div class="head">
+        <div class="t">💬 你们的聊天</div>
+        <div class="pill">点按钮就会发消息</div>
+      </div>
+
+      <div class="chatbox" id="chatbox"></div>
+
+      <div class="composer">
+        <div class="hint">她可以点这些回你：</div>
+        <div class="btns">
+          <button id="ackWake">✅ 我起床啦</button>
+          <button id="ackEat">✅ 我吃饭啦</button>
+          <button id="ackMiss">💗 我也想你</button>
+        </div>
+      </div>
+
+      <div class="foot">
+        小技巧：把文案里的“宝宝/想我”改成你们的专属称呼和暗号，杀伤力会更强。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (s)=>document.querySelector(s);
+    const chatbox = $("#chatbox");
+    const sticker = $("#sticker");
+    const stickerBubble = $("#stickerBubble");
+
+    const LS = {
+      miss: "baby2_miss_count",
+      ack:  "baby2_ack",
+      chat: "baby2_chat",
+    };
+
+    function todayStr(){
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      return `${y}-${m}-${day}`;
+    }
+    $("#today").textContent = `📅 ${todayStr()}`;
+
+    function hm(){
+      const d = new Date();
+      return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+    }
+
+    function shake(){
+      sticker.classList.remove("shake");
+      void sticker.offsetWidth;
+      sticker.classList.add("shake");
+    }
+
+    function readInt(k, def=0){
+      const v = Number(localStorage.getItem(k));
+      return Number.isFinite(v) ? v : def;
+    }
+    function write(k, v){ localStorage.setItem(k, String(v)); }
+
+    function setKPI(){
+      $("#kMiss").textContent = readInt(LS.miss, 0);
+      $("#kAck").textContent = localStorage.getItem(LS.ack) || "暂无";
+    }
+
+    function pushLine(who, avatar, text){
+      const t = hm();
+      const line = document.createElement("div");
+      line.className = "line " + (who==="me" ? "me" : "them");
+
+      if(who!=="me"){
+        const av = document.createElement("div");
+        av.className = "avatar";
+        av.textContent = avatar;
+        line.appendChild(av);
+      }
+
+      const bub = document.createElement("div");
+      bub.className = "bubble2";
+      bub.textContent = text;
+      line.appendChild(bub);
+
+      if(who==="me"){
+        const av = document.createElement("div");
+        av.className = "avatar";
+        av.textContent = avatar;
+        line.appendChild(av);
+      }
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = t;
+
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(line);
+      wrapper.appendChild(meta);
+
+      chatbox.appendChild(wrapper);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      saveChat();
+    }
+
+    function saveChat(){
+      // 保存纯文本版聊天（简单够用）
+      const items = [];
+      chatbox.querySelectorAll(".bubble2").forEach(b => items.push(b.textContent));
+      localStorage.setItem(LS.chat, JSON.stringify(items));
+    }
+
+    function loadChat(){
+      const raw = localStorage.getItem(LS.chat);
+      if(!raw) return;
+      try{
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr)) return;
+        // 简化：重新生成成“系统记录”（不区分左右）
+        chatbox.innerHTML = "";
+        arr.forEach(txt=>{
+          pushLine("them","💬", txt);
+        });
+      }catch(e){}
+    }
+
+    function stickerSay(text){
+      stickerBubble.textContent = text;
+      shake();
+    }
+
+    function send(type){
+      if(type==="wake"){
+        pushLine("them","🐰", "宝宝～起床了吗？\n醒了就先喝两口水，再慢慢来。");
+        stickerSay("起床了吗？\n（乌萨奇：快快快！）");
+      }
+      if(type==="eat"){
+        pushLine("them","🪽", "记得吃饭！\n哪怕忙，也要先垫点东西～");
+        stickerSay("记得吃饭！\n（小八：我盯着你）");
+      }
+      if(type==="miss"){
+        const c = readInt(LS.miss,0)+1;
+        write(LS.miss, c);
+        pushLine("them","💗", `还有一件事：记得想我。\n（今天已想我 ${c} 次）`);
+        stickerSay("记得想我！\n（两只一起点头）");
+      }
+      if(type==="combo"){
+        send("wake"); send("eat"); send("miss");
+      }
+      setKPI();
+    }
+
+    function ack(type){
+      let text="";
+      if(type==="wake"){ text="我起床啦！你别凶我～"; }
+      if(type==="eat"){ text="我吃饭啦！你也要记得吃。"; }
+      if(type==="miss"){ text="我也想你。"; }
+      pushLine("me","😊", text);
+      write(LS.ack, text);
+      setKPI();
+      stickerSay("收到回执！\n（乌萨奇：满意）");
+    }
+
+    $("#wake").addEventListener("click", ()=>send("wake"));
+    $("#eat").addEventListener("click", ()=>send("eat"));
+    $("#miss").addEventListener("click", ()=>send("miss"));
+    $("#combo").addEventListener("click", ()=>send("combo"));
+
+    $("#ackWake").addEventListener("click", ()=>ack("wake"));
+    $("#ackEat").addEventListener("click", ()=>ack("eat"));
+    $("#ackMiss").addEventListener("click", ()=>ack("miss"));
+
+    $("#clear").addEventListener("click", ()=>{
+      chatbox.innerHTML="";
+      localStorage.removeItem(LS.chat);
+      stickerSay("清空啦～\n（小八：重新开始）");
+    });
+
+    // 初次欢迎语
+    setKPI();
+    if(!localStorage.getItem(LS.chat)){
+      pushLine("them","🐰", "宝宝提醒站已上线。\n先问一句：起床了吗？");
+      stickerSay("宝宝～起床了吗？\n（小八举手：我来问！）");
+    }else{
+      // 你不想自动恢复聊天，删掉这行
+      // loadChat();
+    }
+  </script>
+</body>
+</html>
