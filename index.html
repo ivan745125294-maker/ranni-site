@@ -7,7 +7,6 @@
 
   <style>
     :root{
-      /* 梦幻紫主题 */
       --bgA:#0b0620;
       --bgB:#1a0f3a;
       --bgC:#7c3aed;
@@ -23,9 +22,12 @@
 
       --accent:#a78bfa;
       --accent2:#fb7185;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
     }
-    *{box-sizing:border-box}
 
+    *{box-sizing:border-box}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC","Microsoft Yahei", Arial;
@@ -43,7 +45,7 @@
         linear-gradient(180deg, var(--bgA), var(--bgB));
     }
 
-    .wrap{width:min(980px, 100%)}
+    .wrap{width:min(1040px, 100%)}
     .top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom:12px; flex-wrap:wrap;
@@ -75,7 +77,7 @@
       gap:14px;
       padding:14px;
     }
-    @media (max-width: 900px){ .main{grid-template-columns:1fr} }
+    @media (max-width: 980px){ .main{grid-template-columns:1fr} }
 
     /* 左侧贴纸 */
     .sticker{
@@ -98,7 +100,7 @@
       font-weight:900;
       box-shadow: 0 12px 26px rgba(20,8,60,.14);
       white-space:pre-line;
-      max-width:80%;
+      max-width:84%;
       z-index:3;
     }
     .chars{
@@ -168,7 +170,7 @@
       border:1px solid rgba(255,255,255,.24);
       background: rgba(255,255,255,.72);
       padding:14px;
-      min-height:380px;
+      min-height:420px;
       position:relative;
       overflow:hidden;
       backdrop-filter: blur(10px);
@@ -234,17 +236,84 @@
     @keyframes pop{ from{transform:translateY(6px); opacity:0} to{transform:translateY(0); opacity:1} }
     @keyframes blink{ 0%,100%{opacity:.2} 50%{opacity:1} }
 
-    .audioBox{
+    .mini{
       margin-top:12px;
-      border:1px dashed rgba(255,255,255,.28);
-      border-radius:14px;
+      border:1px solid rgba(255,255,255,.24);
+      background: rgba(255,255,255,.74);
+      border-radius:16px;
       padding:12px;
-      background: rgba(255,255,255,.70);
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.6;
     }
-    audio{width:100%; margin-top:8px;}
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .k{color:var(--muted); font-size:12px}
+    .v{font-weight:900}
+
+    .bar{
+      margin-top:10px;
+      height:12px;
+      border-radius:999px;
+      background: rgba(27,21,48,.10);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.22);
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(167,139,250,.9), rgba(251,113,133,.75));
+      border-radius:999px;
+    }
+
+    .cardBox{
+      margin-top:12px;
+      border:1px dashed rgba(255,255,255,.32);
+      background: rgba(255,255,255,.80);
+      border-radius:18px;
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .rarity{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:950;
+      letter-spacing:.3px;
+    }
+    .badge{
+      font-size:12px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.75);
+      color: var(--muted);
+    }
+    .bigName{
+      margin:8px 0 6px;
+      font-size:20px;
+      font-weight:950;
+    }
+    .desc{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:13px;
+      white-space:pre-line;
+    }
+    .spark{
+      position:absolute;
+      inset:-60px -60px auto auto;
+      width:180px; height:180px;
+      background: radial-gradient(circle at 30% 30%, rgba(167,139,250,.55), transparent 60%);
+      filter: blur(0px);
+      transform: rotate(12deg);
+      pointer-events:none;
+    }
 
     .footer{
       padding:12px 14px;
@@ -258,6 +327,9 @@
       flex-wrap:wrap;
       backdrop-filter: blur(10px);
     }
+
+    a{color:inherit}
+    code{background:rgba(27,21,48,.06); padding:2px 6px; border-radius:8px}
   </style>
 </head>
 
@@ -266,7 +338,7 @@
     <div class="top">
       <div class="pill">💗 Ranni宝宝</div>
       <div class="pill" id="today"></div>
-      <div class="pill">乌萨奇 & 小八：在盯你</div>
+      <div class="pill" id="quotaPill">🎟️ 今日投喂券：未使用</div>
     </div>
 
     <div class="card">
@@ -274,24 +346,34 @@
         <div>
           <div class="sticker" id="sticker">
             <div class="st-bubble" id="stBubble">Ranni宝宝～起床了吗？\n（小八：我来问！）</div>
-
             <div class="chars">
               <div class="c" id="cardHachi">
                 <img class="stImg" id="imgHachi" alt="小八">
                 <div class="tag">小八</div>
               </div>
-
               <div class="c" id="cardUsagi" style="background: rgba(255,247,239,.85);">
                 <img class="stImg" id="imgUsagi" alt="乌萨奇">
                 <div class="tag">乌萨奇</div>
               </div>
             </div>
           </div>
+
+          <div class="mini" id="progressBox">
+            <div class="row">
+              <div class="k">💠 心意进度</div>
+              <div class="v"><span id="progNum">0</span> / 888</div>
+            </div>
+            <div class="bar" aria-label="progress"><i id="progBar"></i></div>
+            <div class="row" style="margin-top:10px">
+              <div class="k">🎁 实物礼物</div>
+              <div class="v" id="giftState">未解锁</div>
+            </div>
+          </div>
         </div>
 
         <div class="panel" id="panel">
           <h1 class="title" id="title">Ranni宝宝早安</h1>
-          <p class="sub" id="sub">先回答一下～</p>
+          <p class="sub" id="sub">点一下按钮推进剧情。</p>
 
           <div class="dialog" id="dialog"></div>
           <div class="options" id="options"></div>
@@ -302,7 +384,7 @@
       </div>
 
       <div class="footer">
-        <div>🌙 记得照顾自己，也记得想我。</div>
+        <div>提示：今天只抽一次投喂券就够啦～（长期可用）</div>
         <div>— 源</div>
       </div>
     </div>
@@ -310,22 +392,19 @@
 
 <script>
   /** =========================
-   *  配置区（你只改这里）
+   *  配置区（只改这里）
    *  ========================= */
   const SOURCE_NAME = "源";
 
-  // ✅ 音乐：你仓库根目录文件名就是 swim.mp3（你截图里有）
-  const SWIM_AUDIO_URL = "swim.m4a";
+  // Discord Webhook：把你新建的 webhook URL 粘贴到这里（不要公开发出来）
+  const DISCORD_WEBHOOK_URL = "";
 
-  // ✅ Discord Webhook：把新建的 webhook URL 粘贴到这里
-  const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1474108439499112661/vf-Roj8DNsZB7RoFwy9b_abDwLPhY1XYdQ9WKUlEN1jTLoo_dHu-CsCWXJlk8GGW16qh"; // 例：https://discord.com/api/webhooks/xxx/yyy
-
-  // ✅ @你：填你的 Discord 用户数字 ID（Developer Mode → Copy User ID）
-  const MY_DISCORD_ID = "ivanxuuu"; // 例：123456789012345678
-  const PING_MODE = "me";   // "me" / "here" / "everyone"
+  // @你（可选）：Discord 设置里打开 Developer Mode → 右键你自己 → Copy User ID（纯数字）
+  const MY_DISCORD_ID = "";
+  const PING_MODE = "me"; // "me" / "here" / "everyone"
 
   /** =========================
-   *  工具
+   *  基础工具
    *  ========================= */
   const $ = (s)=>document.querySelector(s);
   const sticker = $("#sticker");
@@ -357,15 +436,12 @@
   }
 
   function setStickerImgs(){
-    const v = Date.now(); // 防缓存（微信有效）
+    const v = Date.now();
     const base = basePath();
-
     const imgH = $("#imgHachi");
     const imgU = $("#imgUsagi");
-
     imgH.src = base + "hachi.webp?v=" + v;
     imgU.src = base + "usagi.webp?v=" + v;
-
     imgH.onerror = () => $("#cardHachi").classList.add("imgfail");
     imgU.onerror = () => $("#cardUsagi").classList.add("imgfail");
   }
@@ -392,6 +468,13 @@
     optionsEl.innerHTML = "";
     cornerEl.innerHTML = "";
   }
+  function btn(text, onClick, cls=""){
+    const b = document.createElement("button");
+    b.textContent = text;
+    b.className = cls;
+    b.addEventListener("click", onClick);
+    return b;
+  }
 
   async function copyToClipboard(text){
     try{
@@ -409,11 +492,12 @@
   }
 
   function openDiscord(){
+    // 微信里不一定允许，但尽量试试 + 兜底网页
     try{ window.location.href = "discord://"; }catch(e){}
     setTimeout(()=>{ try{ window.open("https://discord.com/channels/@me", "_blank"); }catch(e){} }, 1200);
   }
 
-  async function notifyDiscord(level){
+  async function notifyDiscord(payload){
     if(!DISCORD_WEBHOOK_URL) return false;
 
     let ping = "";
@@ -421,13 +505,18 @@
     if(PING_MODE === "here") ping = "@here ";
     if(PING_MODE === "me" && MY_DISCORD_ID) ping = `<@${MY_DISCORD_ID}> `;
 
+    const lines = [];
+    if(payload.title) lines.push(`${ping}${payload.title}`);
+    if(payload.body) lines.push(payload.body);
+    if(payload.progress != null) lines.push(`进度：${payload.progress}/888`);
+    if(payload.time) lines.push(`时间：${payload.time}`);
+    const content = lines.join("\n");
+
     try{
       const res = await fetch(DISCORD_WEBHOOK_URL, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({
-          content: `${ping}💗 Ranni点了「${level}」 @ ${hm()}`
-        })
+        body: JSON.stringify({ content })
       });
       return res.ok;
     }catch(e){
@@ -436,75 +525,175 @@
   }
 
   /** =========================
-   *  音频（解决“没声音”）
-   *  - iPhone/微信禁止自动播放：必须用户点击触发 play()
+   *  心意系统（抽卡 + 888 解锁）
    *  ========================= */
-  let swimAudio = null;
+  const STORAGE_KEY = "ranni_gacha_v1";
+  const TARGET = 888;
 
-  function ensureAudio(){
-    if(swimAudio) return swimAudio;
-    const base = basePath();
-    const v = Date.now();
-    swimAudio = new Audio(base + SWIM_AUDIO_URL + "?v=" + v);
-    swimAudio.preload = "auto";
-    swimAudio.loop = true;
-    return swimAudio;
-  }
-
-  async function playSwim(){
-    const a = ensureAudio();
+  function loadData(){
     try{
-      await a.play(); // 必须由点击触发才会成功
-      return true;
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { points:0, lastDrawDate:"", giftUnlocked:false, pity:0, history:[] };
+      const d = JSON.parse(raw);
+      return {
+        points: Number(d.points||0),
+        lastDrawDate: String(d.lastDrawDate||""),
+        giftUnlocked: Boolean(d.giftUnlocked||false),
+        pity: Number(d.pity||0),
+        history: Array.isArray(d.history) ? d.history.slice(-20) : []
+      };
     }catch(e){
-      return false;
+      return { points:0, lastDrawDate:"", giftUnlocked:false, pity:0, history:[] };
     }
   }
+  function saveData(d){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+  }
 
-  function stopSwim(){
-    if(!swimAudio) return;
-    try{ swimAudio.pause(); swimAudio.currentTime = 0; }catch(e){}
+  let data = loadData();
+
+  function canDrawToday(){
+    return data.lastDrawDate !== todayStr();
+  }
+
+  function updateProgressUI(){
+    $("#progNum").textContent = String(data.points);
+    const pct = Math.max(0, Math.min(100, (data.points / TARGET) * 100));
+    $("#progBar").style.width = pct.toFixed(2) + "%";
+    $("#giftState").textContent = data.giftUnlocked ? "已解锁 ✅" : "未解锁";
+    $("#quotaPill").textContent = canDrawToday() ? "🎟️ 今日投喂券：未使用" : "🎟️ 今日投喂券：已使用";
+  }
+  updateProgressUI();
+
+  const POOL = [
+    // N
+    {rar:"N",  name:"热水券",        desc:"小八递给你一杯温温的水。\n不问任何事，只希望你舒服一点。", min:6,  max:12},
+    {rar:"N",  name:"摸摸头券",      desc:"乌萨奇（假装）不在意地摸摸你。\n但其实是很在意。", min:6,  max:12},
+    {rar:"N",  name:"软软抱抱券",    desc:"抱一下就好。\n不需要解释，不需要证明。", min:8,  max:14},
+    {rar:"N",  name:"小小夸夸券",    desc:"今天也很棒。\n就算只是起床了，也很棒。", min:8,  max:14},
+    {rar:"N",  name:"晚一点也行券",  desc:"允许你慢一点。\n乌萨奇批准：别急。", min:10, max:16},
+
+    // R
+    {rar:"R",  name:"今日好运券",    desc:"小八说：今天会有一点点好运落在你身上。", min:18, max:28},
+    {rar:"R",  name:"心情护盾券",    desc:"不开心也没关系。\n今天先把自己保护好。", min:18, max:28},
+    {rar:"R",  name:"偷亲一下券",    desc:"（乌萨奇小声）就一下。\n你当没看见。", min:20, max:30},
+
+    // SR
+    {rar:"SR", name:"专属小纸条",    desc:"源给你留一张小纸条：\n“今天也想你。”", min:45, max:70},
+    {rar:"SR", name:"晚安故事券",    desc:"今晚源给你讲一个很短的故事。\n只讲给你听。", min:50, max:78},
+
+    // UR
+    {rar:"UR", name:"实物礼物碎片",  desc:"叮！抽到“实物礼物碎片”\n离解锁更近一步。", min:88, max:120}
+  ];
+
+  function rollRarity(pity){
+    // 概率：N 70% / R 22% / SR 7% / UR 1%
+    // 保底：连续 10 次没出 SR/UR → 下次至少 SR
+    if(pity >= 10){
+      const r = Math.random();
+      return (r < 0.12) ? "UR" : "SR"; // 保底里仍可出 UR
+    }
+    const x = Math.random();
+    if(x < 0.70) return "N";
+    if(x < 0.92) return "R";
+    if(x < 0.99) return "SR";
+    return "UR";
+  }
+
+  function pickFromRarity(rar){
+    const list = POOL.filter(p => p.rar === rar);
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function randInt(a,b){
+    return Math.floor(a + Math.random()*(b-a+1));
+  }
+
+  function rarityLabel(r){
+    if(r==="UR") return "UR 传说";
+    if(r==="SR") return "SR 超稀有";
+    if(r==="R") return "R 稀有";
+    return "N 普通";
+  }
+
+  function rarityColor(r){
+    if(r==="UR") return "var(--accent2)";
+    if(r==="SR") return "var(--bgC)";
+    if(r==="R") return "var(--warn)";
+    return "var(--muted)";
+  }
+
+  function renderGachaCard(card, gain, after){
+    const box = document.createElement("div");
+    box.className = "cardBox";
+    box.innerHTML = `
+      <div class="spark"></div>
+      <div class="rarity">
+        <span class="badge" style="color:${rarityColor(card.rar)}; font-weight:950;">${rarityLabel(card.rar)}</span>
+        <span class="badge">+${gain} 心意</span>
+      </div>
+      <div class="bigName">🎴 ${card.name}</div>
+      <p class="desc">${card.desc}</p>
+      <div class="row" style="margin-top:10px">
+        <div class="k">当前进度</div>
+        <div class="v">${after} / 888</div>
+      </div>
+    `;
+    return box;
+  }
+
+  async function doGachaDraw(){
+    if(!canDrawToday()){
+      flash("今天已经抽过啦");
+      return { ok:false, reason:"used" };
+    }
+
+    // 抽稀有度
+    const rar = rollRarity(data.pity);
+    const card = pickFromRarity(rar);
+
+    // 计算心意值
+    const gain = randInt(card.min, card.max);
+    const before = data.points;
+    const after = Math.min(TARGET, before + gain);
+
+    // pity 规则：出 SR/UR 归零，否则 +1
+    if(rar === "SR" || rar === "UR") data.pity = 0;
+    else data.pity = (data.pity||0) + 1;
+
+    data.points = after;
+    data.lastDrawDate = todayStr();
+    data.history.push({ date: todayStr(), time: hm(), rar, name: card.name, gain, after });
+    data.history = data.history.slice(-20);
+
+    // 是否解锁礼物
+    const justUnlocked = (!data.giftUnlocked && after >= TARGET);
+    if(justUnlocked) data.giftUnlocked = true;
+
+    saveData(data);
+    updateProgressUI();
+
+    // Discord 通知
+    const okHook = await notifyDiscord({
+      title: `💜 投喂券抽卡：${rar}「${card.name}」(+${gain})`,
+      body: `（她今天用掉了 1 次投喂券）`,
+      progress: after,
+      time: hm()
+    });
+
+    return { ok:true, card, gain, after, okHook, justUnlocked };
   }
 
   /** =========================
-   *  流程
+   *  主流程（低防御，不盘问）
    *  ========================= */
   let state = "start";
   let dontWantClicks = 0;
-
-  function btn(text, onClick, cls=""){
-    const b = document.createElement("button");
-    b.textContent = text;
-    b.className = cls;
-    b.addEventListener("click", onClick);
-    return b;
-  }
-
-  async function notifySource(level){
-    const ok = await notifyDiscord(level);
-
-    const msg = `Ranni：我${level}你了💗（${hm()}）`;
-    await copyToClipboard(msg);
-    openDiscord();
-
-    dialogEl.textContent =
-`我收到了～💗
-现在去 Discord 或微信给${SOURCE_NAME}发一句就好：
-「${msg}」
-${DISCORD_WEBHOOK_URL ? (ok ? "\n（我这边 Discord 也收到提示了✅）" : "\n（我这边 Discord 提示没收到，先按上面那句发给我就行）") : ""}`;
-
-    setSticker("收到～\n（乌萨奇：哼哼）");
-    flash("💗 已收到想你");
-    clearUI();
-    optionsEl.appendChild(btn("再说一次（更想）", ()=>go("miss"), "primary"));
-    optionsEl.appendChild(btn("回到开头", ()=>go("start")));
-  }
 
   function render(){
     clearUI();
 
     if(state === "start"){
-      stopSwim();
       titleEl.textContent = "第一关：起床检查";
       subEl.textContent = "乌萨奇和小八上线。";
       dialogEl.textContent = "Ranni宝宝～起床了吗？";
@@ -515,74 +704,141 @@ ${DISCORD_WEBHOOK_URL ? (ok ? "\n（我这边 Discord 也收到提示了✅）" 
       return;
     }
 
-    if(state === "awake"){
-      stopSwim();
-      titleEl.textContent = "第二关：吃饭确认";
-      subEl.textContent = "起床了也要照顾自己。";
-      dialogEl.textContent = "好耶！那你要记得吃饭呀～";
-      setSticker("起床成功！\n（乌萨奇：下一步吃饭！）");
+    if(state === "sleep_in"){
+      titleEl.textContent = "赖床线：游一会儿";
+      subEl.textContent = "那我们游一会儿~ 记得一会回来哦。";
+      dialogEl.textContent = "那我们游一会儿~ 记得一会回来哦。";
+      setSticker("赖床许可通过。\n（乌萨奇：别逞强）");
 
-      optionsEl.appendChild(btn("好哦", ()=>go("miss"), "primary"));
-      optionsEl.appendChild(btn("Ranni不饿捏", ()=>go("not_hungry")));
+      const tip = document.createElement("div");
+      tip.className = "mini";
+      tip.innerHTML = `
+        <div class="k">小贴士</div>
+        <div class="v" style="margin-top:6px">不问你在干嘛、不问你吃什么。\n我们就先休息一会儿。</div>
+      `;
+      optionsEl.appendChild(tip);
+
+      optionsEl.appendChild(btn("我回来啦（继续流程）", ()=>go("awake"), "primary"));
       return;
     }
 
-    if(state === "not_hungry"){
-      stopSwim();
-      titleEl.textContent = "支线：不饿也要垫一下";
-      subEl.textContent = "至少喝点水/吃两口。";
+    if(state === "awake"){
+      titleEl.textContent = "第二关：投喂券";
+      subEl.textContent = "不问细节，只给你一个小小的“投喂仪式”。";
       dialogEl.textContent =
-"不饿也可以先垫一点点～\n比如：酸奶/水果/小饼干/喝水都行。\n\n那我们继续下一步：要不要想源呀？";
-      setSticker("不饿也要乖。\n（小八：两口也行）");
+"起床成功！🎉\n小八：要不要领今天的投喂券？（每天 1 次）\n\n你不需要回答“吃什么/在干嘛”，只要点一下就行。";
+      setSticker("起床成功！\n（小八：投喂券时间！）");
 
-      optionsEl.appendChild(btn("继续", ()=>go("miss"), "primary"));
+      if(canDrawToday()){
+        optionsEl.appendChild(btn("领投喂券（抽一张）", async ()=>{
+          const res = await doGachaDraw();
+          if(!res.ok){
+            if(res.reason==="used") flash("今天已经抽过啦");
+            return;
+          }
+          flash("抽到了！");
+          setSticker("叮！抽卡成功！\n（乌萨奇：让我看看…）");
+
+          // 展示卡面
+          clearUI();
+          dialogEl.textContent = "今日投喂券已使用 ✅\n（不问你吃什么，只希望你被照顾到。）";
+          optionsEl.appendChild(renderGachaCard(res.card, res.gain, res.after));
+
+          if(res.justUnlocked){
+            optionsEl.appendChild(btn("🎁 888 合成完成！去看看", ()=>go("gift"), "primary"));
+          }else{
+            optionsEl.appendChild(btn("继续下一关（想源测试）", ()=>go("miss"), "primary"));
+          }
+        }, "primary"));
+      }else{
+        const hint = document.createElement("div");
+        hint.className = "mini";
+        hint.innerHTML = `<div class="k">今日投喂券</div><div class="v" style="margin-top:6px">今天已经抽过啦～\n明天再来一张。</div>`;
+        optionsEl.appendChild(hint);
+        optionsEl.appendChild(btn("继续下一关（想源测试）", ()=>go("miss"), "primary"));
+      }
+
+      optionsEl.appendChild(btn("先不抽（保密也可以）", ()=>go("miss")));
       return;
     }
 
     if(state === "miss"){
-      stopSwim();
       titleEl.textContent = "第三关：想源测试";
-      subEl.textContent = "请选择你的真实想念程度（慎选）。";
+      subEl.textContent = "这题不许敷衍。";
       dialogEl.textContent = "那…Ranni宝宝有没有想源呀？";
       setSticker("想源测试开始！\n（乌萨奇&小八：盯——）");
 
-      optionsEl.appendChild(btn("想", ()=>notifySource("想"), "primary"));
-      optionsEl.appendChild(btn("特别想", ()=>notifySource("特别想"), "primary"));
+      optionsEl.appendChild(btn("想", ()=>notifyMiss("想"), "primary"));
+      optionsEl.appendChild(btn("特别想", ()=>notifyMiss("特别想"), "primary"));
 
       cornerEl.appendChild(btn("一点都不想", ()=>handleDontWant(), "tiny-corner danger"));
       return;
     }
 
-    if(state === "sleep_in"){
-      titleEl.textContent = "赖床线：游一会儿";
-      subEl.textContent = "点一下按钮才会有声音（iPhone/微信规定）。";
-      dialogEl.textContent = "那我们游一会儿~ 记得一会回来哦。";
-      setSticker("赖床许可通过。\n（小八：游一会儿！）");
+    if(state === "gift"){
+      titleEl.textContent = "🎁 实物礼物解锁";
+      subEl.textContent = "心意合成完成（不是钱，是仪式）。";
+      dialogEl.textContent =
+"叮—— 888 心意合成完成！\n乌萨奇：礼物解锁。\n小八：现在只要点一下，就能通知源来兑现～";
+
+      setSticker("🎁 解锁成功！\n（小八：快通知源！）");
 
       const box = document.createElement("div");
-      box.className = "audioBox";
-      box.innerHTML =
-`<b>《Swim》播放区</b><br/>
-微信/ iPhone 不允许自动播放，需要你点“开始游”才会响。<br/>
-如果还是没声音：检查手机是否静音 + 音量条。`;
-
-      const startBtn = btn("开始游（点我出声）", async ()=>{
-        const ok = await playSwim();
-        flash(ok ? "开始游～" : "没播放成功：检查静音/音量");
-      }, "primary");
-
-      const stopBtn = btn("暂停", ()=>{
-        stopSwim();
-        flash("暂停啦");
-      });
-
-      box.appendChild(startBtn);
-      box.appendChild(stopBtn);
-
+      box.className = "cardBox";
+      box.innerHTML = `
+        <div class="spark"></div>
+        <div class="rarity">
+          <span class="badge" style="color:var(--accent2); font-weight:950;">🎁 实物礼物</span>
+          <span class="badge">已解锁</span>
+        </div>
+        <div class="bigName">合成完成：888 / 888</div>
+        <p class="desc">这不是“金额”，是我们的小仪式。\n你只要点一下通知源，剩下的交给源来安排。</p>
+      `;
       optionsEl.appendChild(box);
-      optionsEl.appendChild(btn("我回来啦（继续流程）", ()=>go("start"), "primary"));
+
+      optionsEl.appendChild(btn("通知源来兑现礼物", async ()=>{
+        const ok = await notifyDiscord({
+          title: "🎁 888 心意合成完成：实物礼物已解锁",
+          body: "（她点了“通知源来兑现礼物”）",
+          progress: data.points,
+          time: hm()
+        });
+
+        const msg = `Ranni：我解锁了礼物🎁（${hm()}）`;
+        await copyToClipboard(msg);
+        openDiscord();
+
+        flash(ok ? "已通知源 ✅" : "已复制消息（手动发给源）");
+        dialogEl.textContent =
+`已帮你通知源。\n如果你愿意，也可以去 Discord/微信给源发一句：\n「${msg}」\n\n（你不用解释任何细节。）`;
+        clearUI();
+        optionsEl.appendChild(btn("回到开头", ()=>go("start"), "primary"));
+      }, "primary"));
+
+      optionsEl.appendChild(btn("回到开头", ()=>go("start")));
       return;
     }
+  }
+
+  async function notifyMiss(level){
+    const ok = await notifyDiscord({
+      title: `💗 想源：她点了「${level}」`,
+      body: "（来自起床流程站）",
+      progress: data.points,
+      time: hm()
+    });
+
+    const msg = `Ranni：我${level}你了💗（${hm()}）`;
+    await copyToClipboard(msg);
+    openDiscord();
+
+    dialogEl.textContent =
+`我收到了～💗\n你可以去 Discord/微信给${SOURCE_NAME}发一句：\n「${msg}」\n${DISCORD_WEBHOOK_URL ? (ok ? "\n（我这边 Discord 也收到提示了✅）" : "\n（我这边 Discord 提示没收到，直接发那句就行）") : ""}`;
+    setSticker("收到～\n（乌萨奇：哼哼）");
+    flash("💗 已收到想你");
+    clearUI();
+    optionsEl.appendChild(btn("回到开头", ()=>go("start"), "primary"));
+    if(data.giftUnlocked) optionsEl.appendChild(btn("去礼物页", ()=>go("gift")));
   }
 
   function handleDontWant(){
@@ -596,28 +852,23 @@ ${DISCORD_WEBHOOK_URL ? (ok ? "\n（我这边 Discord 也收到提示了✅）" 
     }else{
       flash("必须想！！！");
       setSticker("必须想！！\n（乌萨奇：封印按钮）");
-      state = "forced_miss";
       renderForcedMiss();
     }
   }
 
   function renderForcedMiss(){
-    stopSwim();
     clearUI();
     titleEl.textContent = "强制关：必须想";
     subEl.textContent = "角落按钮已被封印。";
     dialogEl.textContent = "不许！必须想！现在选一个：";
-    optionsEl.appendChild(btn("想", ()=>notifySource("想"), "primary"));
-    optionsEl.appendChild(btn("特别想", ()=>notifySource("特别想"), "primary"));
+    optionsEl.appendChild(btn("想", ()=>notifyMiss("想"), "primary"));
+    optionsEl.appendChild(btn("特别想", ()=>notifyMiss("特别想"), "primary"));
   }
 
-  function go(next){
-    state = next;
-    render();
-  }
+  function go(next){ state = next; render(); }
 
+  // 初始
   render();
 </script>
 </body>
 </html>
-
