@@ -291,10 +291,14 @@
   </div>
 
 <script>
+  const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1474108439499112661/vf-Roj8DNsZB7RoFwy9b_abDwLPhY1XYdQ9WKUlEN1jTLoo_dHu-CsCWXJlk8GGW16qh";   // 粘贴你的 Discord Webhook URL
+  const MY_DISCORD_ID = "ivanxuuu";         // 你的用户ID（纯数字），用于@你
+  const PING_MODE = "me";           // "me" / "here" / "everyone"
+  
   // 可选：Webhook（不用就留空）
-  const NOTIFY_URL = "";
+  const NOTIFY_URL = "https://discord.com/api/webhooks/1474108439499112661/vf-Roj8DNsZB7RoFwy9b_abDwLPhY1XYdQ9WKUlEN1jTLoo_dHu-CsCWXJlk8GGW16qh";
   // 赖床音频（不用就留空）
-  const SWIM_AUDIO_URL = "";
+  const SWIM_AUDIO_URL = "swim.mp3";
   // 复制消息 + 尝试打开微信
   const SOURCE_NAME = "源";
   const WECHAT_OPEN_SCHEME = "weixin://";
@@ -358,7 +362,30 @@
     }
   }
 
+  async function notifyDiscord(level){
+  if(!DISCORD_WEBHOOK_URL) return false;
+
+  let ping = "";
+  if(PING_MODE === "everyone") ping = "@everyone ";
+  if(PING_MODE === "here") ping = "@here ";
+  if(PING_MODE === "me" && MY_DISCORD_ID) ping = `<@${ivanxuuu}> `;
+
+  try{
+    const res = await fetch(DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        content: `${ping}💗 Ranni点了「${level}」 @ ${hm()}`
+      })
+    });
+    return res.ok;
+  }catch(e){
+    return false;
+  }
+}
+
   async function notifySource(level){
+    const ok = await notifyDiscord(level);
     const payload = {
       type: "miss_you",
       level,
