@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ranni宝宝起床流程站</title>
+  <title>Ranni宝宝起床啦</title>
   <style>
     :root{
       --bg1:#fff7fb;
@@ -62,7 +62,7 @@
     }
     @media (max-width: 900px){ .main{grid-template-columns:1fr} }
 
-    /* 左侧：乌萨奇&小八（原创风格占位） */
+    /* 左侧：乌萨奇&小八（贴纸版） */
     .sticker{
       width:100%;
       aspect-ratio: 1 / 1;
@@ -89,12 +89,12 @@
       display:flex;
       align-items:flex-end;
       justify-content:space-around;
-      padding:26px 18px 16px;
+      padding:60px 18px 16px; /* 往下挪，避免被气泡挡 */
       gap:14px;
     }
     .c{
-      width:45%;
-      height:58%;
+      width:48%;
+      height:78%;
       border-radius:22px;
       border:1px solid var(--border);
       background:#fff;
@@ -103,29 +103,13 @@
       justify-content:center;
       position:relative;
     }
-    .face{
-      width:74%;
-      height:74%;
-      border-radius:20px;
-      border:1px solid var(--border);
-      position:relative;
-      background: linear-gradient(180deg,#fff, #fafafa);
-    }
-    .ear{
-      position:absolute; width:34%; height:30%;
-      border:1px solid var(--border);
-      border-radius:14px; top:-10%; background:#fff;
-    }
-    .ear.l{left:6%} .ear.r{right:6%}
-    .eye{position:absolute; top:42%; width:10px; height:14px; background:#222; border-radius:10px;}
-    .eye.l{left:28%} .eye.r{right:28%}
-    .mouth{
-      position:absolute; top:62%; left:50%;
-      width:22px; height:10px;
-      border:2px solid #222;
-      border-top:none; border-left:none; border-right:none;
-      transform:translateX(-50%);
-      border-radius:0 0 999px 999px;
+    .stImg{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      transform: scale(1.22);          /* 放大：想更大就 1.28 / 1.32 */
+      transform-origin: center bottom;
+      pointer-events:none;
     }
     .tag{
       position:absolute; bottom:10px; left:50%;
@@ -135,7 +119,13 @@
       border-radius:999px; padding:6px 10px;
     }
     .shake{animation: shake .28s ease-in-out 1}
-    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+    @keyframes shake{
+      0%{transform:translateX(0)}
+      25%{transform:translateX(-6px)}
+      50%{transform:translateX(6px)}
+      75%{transform:translateX(-4px)}
+      100%{transform:translateX(0)}
+    }
 
     /* 右侧：流程对话 */
     .panel{
@@ -222,7 +212,7 @@
     @keyframes pop{ from{transform:translateY(6px); opacity:0} to{transform:translateY(0); opacity:1} }
     @keyframes blink{ 0%,100%{opacity:.2} 50%{opacity:1} }
 
-    /* 音频区 */
+    /* 音频区（赖床线用） */
     .audioBox{
       margin-top:12px;
       border:1px dashed var(--border);
@@ -234,6 +224,8 @@
       line-height:1.6;
     }
     audio{width:100%; margin-top:8px;}
+
+    /* 小小的温柔署名（可删） */
     .footer{
       padding:12px 14px;
       border-top:1px solid var(--border);
@@ -245,8 +237,6 @@
       justify-content:space-between;
       flex-wrap:wrap;
     }
-    a{color:inherit}
-    code{background:#00000008; padding:2px 6px; border-radius:8px}
   </style>
 </head>
 <body>
@@ -254,7 +244,7 @@
     <div class="top">
       <div class="pill">💗 Ranni宝宝流程站</div>
       <div class="pill" id="today"></div>
-      <div class="pill">乌萨奇 & 小八：流程控制中</div>
+      <div class="pill">乌萨奇 & 小八：在盯你</div>
     </div>
 
     <div class="card">
@@ -262,78 +252,62 @@
         <div>
           <div class="sticker" id="sticker">
             <div class="st-bubble" id="stBubble">Ranni宝宝～起床了吗？\n（小八举手：我来问！）</div>
+
+            <!-- ✅ 贴纸文件放在仓库 assets/ 目录：
+                 assets/hachi.webp
+                 assets/usagi.webp -->
             <div class="chars">
               <div class="c">
-                <div class="face">
-                  <div class="ear l"></div><div class="ear r"></div>
-                  <div class="eye l"></div><div class="eye r"></div>
-                  <div class="mouth"></div>
-                </div>
+                <img class="stImg" src="assets/hachi.webp" alt="小八">
                 <div class="tag">小八</div>
               </div>
 
               <div class="c" style="background:#fff7ef">
-                <div class="face" style="background:linear-gradient(180deg,#fff7ef,#fff)">
-                  <div class="ear l" style="background:#fff7ef"></div>
-                  <div class="ear r" style="background:#fff7ef"></div>
-                  <div class="eye l"></div><div class="eye r"></div>
-                  <div class="mouth"></div>
-                </div>
+                <img class="stImg" src="assets/usagi.webp" alt="乌萨奇">
                 <div class="tag">乌萨奇</div>
               </div>
             </div>
           </div>
-
-          <div class="audioBox" id="devBox">
-            <b>配置区（你要改的地方）</b><br/>
-            1) Webhook：把 <code>NOTIFY_URL</code> 改成你的通知接口（不想用就留空）。<br/>
-            2) 赖床音乐：把 <code>SWIM_AUDIO_URL</code> 换成你有权限的音频 URL（否则只显示“点击播放占位”）。<br/>
-          </div>
         </div>
 
         <div class="panel" id="panel">
-          <h1 class="title" id="title">进入流程</h1>
-          <p class="sub" id="sub">点一下按钮推进剧情。</p>
+          <h1 class="title" id="title">Ranni宝宝早安</h1>
+          <p class="sub" id="sub">先回答一下～</p>
 
           <div class="dialog" id="dialog"></div>
           <div class="options" id="options"></div>
 
-          <!-- 角落小按钮容器 -->
           <div id="corner"></div>
-
-          <!-- 闪烁提示 -->
           <div id="flashHost"></div>
         </div>
       </div>
 
       <div class="footer">
-        <div>提示：iPhone/微信内置浏览器一般不允许自动播放，音乐需要她点一次播放。</div>
-        <div>你要更像原作的视觉：你提供你有授权的素材图，我再帮你替换成贴图版。</div>
+        <div>🌙 记得照顾自己，也记得想我。</div>
+        <div>— 源</div>
       </div>
     </div>
   </div>
 
 <script>
   /** ==========================
-   *  你需要改的配置
+   *  配置（可选）
    *  ========================== */
 
-  // 方案1：Webhook（推荐）—— 她点“想/特别想”时会POST通知到你
-  // 留空 "" 则不发请求
-  const NOTIFY_URL = ""; // 例：https://script.google.com/macros/s/XXXX/exec
+  // Webhook：她点“想/特别想”时会 POST 通知到你（不想用就留空）
+  const NOTIFY_URL = "";
 
-  // 赖床分支音频（你有权限的音频URL，比如你自己上传的mp3）
-  const SWIM_AUDIO_URL = ""; // 例：https://your-domain.com/swim.mp3
+  // 赖床分支音频（你有权限的音频 URL）
+  const SWIM_AUDIO_URL = "";
 
-  // “联系你”的备用方案：复制给你的微信消息模板
+  // 备用联系：复制一段话 + 尝试打开微信
   const SOURCE_NAME = "源";
-  const WECHAT_OPEN_SCHEME = "weixin://"; // 尝试打开微信（不保证所有环境允许）
+  const WECHAT_OPEN_SCHEME = "weixin://";
 
   /** ==========================
    *  工具函数
    *  ========================== */
   const $ = (s)=>document.querySelector(s);
-  const panel = $("#panel");
   const sticker = $("#sticker");
   const stBubble = $("#stBubble");
   const titleEl = $("#title");
@@ -371,12 +345,11 @@
     d.className = "flash";
     d.textContent = text;
     flashHost.appendChild(d);
-    setTimeout(()=>{ flashHost.innerHTML=""; }, 2200);
+    setTimeout(()=>{ flashHost.innerHTML=""; }, 2000);
   }
   function clearUI(){
     optionsEl.innerHTML = "";
     cornerEl.innerHTML = "";
-    // 不清 flashHost，让它自然消失
   }
 
   async function copyToClipboard(text){
@@ -384,7 +357,6 @@
       await navigator.clipboard.writeText(text);
       return true;
     }catch(e){
-      // 兼容降级
       const ta = document.createElement("textarea");
       ta.value = text;
       document.body.appendChild(ta);
@@ -396,7 +368,6 @@
   }
 
   async function notifySource(level){
-    // level: "想" | "特别想"
     const payload = {
       type: "miss_you",
       level,
@@ -410,3 +381,142 @@
       try{
         const res = await fetch(NOTIFY_URL, {
           method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(payload)
+        });
+        webhookOk = res.ok;
+      }catch(e){
+        webhookOk = false;
+      }
+    }
+
+    const msg = `Ranni：我${level}你了💗（${hm()}）`;
+    await copyToClipboard(msg);
+
+    try{ window.location.href = WECHAT_OPEN_SCHEME; }catch(e){}
+
+    // 不要“技术提示”，改成恋爱口吻
+    dialogEl.textContent =
+`我收到了～💗
+现在回微信给${SOURCE_NAME}发一句就好：
+「${msg}」`;
+
+    setSticker("收到～\n（乌萨奇：哼哼）");
+    flash("💗 已收到想你");
+    clearUI();
+    optionsEl.appendChild(btn("再说一次（更想）", ()=>go("miss"), "primary"));
+    optionsEl.appendChild(btn("回到开头", ()=>go("start")));
+  }
+
+  function btn(text, onClick, cls=""){
+    const b = document.createElement("button");
+    b.textContent = text;
+    b.className = cls;
+    b.addEventListener("click", onClick);
+    return b;
+  }
+
+  /** ==========================
+   *  状态机
+   *  ========================== */
+  let state = "start";
+  let dontWantClicks = 0;
+
+  function render(){
+    clearUI();
+
+    if(state === "start"){
+      titleEl.textContent = "Ranni宝宝早安";
+      subEl.textContent = "先回答一下～";
+      dialogEl.textContent = "Ranni宝宝～起床了吗？";
+      setSticker("Ranni宝宝～起床了吗？\n（小八：我来问！）");
+
+      optionsEl.appendChild(btn("起床了，源", ()=>go("awake"), "primary"));
+      optionsEl.appendChild(btn("再赖一会床~", ()=>go("sleep_in")));
+      return;
+    }
+
+    if(state === "awake"){
+      titleEl.textContent = "起床成功！";
+      subEl.textContent = "那要乖乖吃点东西～";
+      dialogEl.textContent = "好耶！那你要记得吃饭呀～";
+      setSticker("起床成功！\n（乌萨奇：下一步吃饭！）");
+
+      optionsEl.appendChild(btn("好哦", ()=>go("miss"), "primary"));
+      optionsEl.appendChild(btn("Ranni不饿捏", ()=>go("not_hungry")));
+      return;
+    }
+
+    if(state === "not_hungry"){
+      titleEl.textContent = "不饿也要乖";
+      subEl.textContent = "垫一点点就行～";
+      dialogEl.textContent =
+"那就先垫一点点～\n喝水也算！\n\n然后…要不要想源呀？";
+      setSticker("不饿也要乖。\n（小八：两口也行）");
+
+      optionsEl.appendChild(btn("继续", ()=>go("miss"), "primary"));
+      return;
+    }
+
+    if(state === "miss"){
+      titleEl.textContent = "最后一题";
+      subEl.textContent = "认真答，不许骗我。";
+      dialogEl.textContent = "那…Ranni宝宝有没有想源呀？";
+      setSticker("想源测试开始！\n（乌萨奇&小八：盯——）");
+
+      optionsEl.appendChild(btn("想", ()=>notifySource("想"), "primary"));
+      optionsEl.appendChild(btn("特别想", ()=>notifySource("特别想"), "primary"));
+
+      const tiny = btn("一点都不想", ()=>handleDontWant(), "tiny-corner danger");
+      cornerEl.appendChild(tiny);
+      return;
+    }
+
+    if(state === "sleep_in"){
+      titleEl.textContent = "赖床许可";
+      subEl.textContent = "那我们游一会儿～";
+      dialogEl.textContent = "那我们游一会儿~ 记得一会回来哦。";
+      setSticker("赖床许可通过。\n（小八：游一会儿！）");
+
+      const box = document.createElement("div");
+      box.className = "audioBox";
+
+      if(SWIM_AUDIO_URL){
+        box.innerHTML = `<b>那我们游一会儿～</b><br/>点播放就开始游。`;
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.preload = "none";
+        audio.src = SWIM_AUDIO_URL;
+        box.appendChild(audio);
+      }else{
+        // 没配置音频就不出现“开发提示”
+        box.innerHTML = `<b>那我们游一会儿～</b><br/>（先不放歌也可以～你赖一会儿也行。）`;
+      }
+
+      optionsEl.appendChild(box);
+      optionsEl.appendChild(btn("我回来啦（继续）", ()=>go("start"), "primary"));
+      return;
+    }
+  }
+
+  function handleDontWant(){
+    dontWantClicks += 1;
+    if(dontWantClicks === 1){
+      flash("真～的不想？");
+      setSticker("嗯？\n（乌萨奇：你再说一次？）");
+    }else if(dontWantClicks === 2){
+      flash("不行！这句不许选");
+      setSticker("不可以！\n（小八：摇头）");
+    }else{
+      flash("按钮没收😤 必须想");
+      setSticker("必须想！！\n（乌萨奇：封印按钮）");
+      state = "forced_miss";
+      renderForcedMiss();
+    }
+  }
+
+  function renderForcedMiss(){
+    clearUI();
+    titleEl.textContent = "不许";
+    subEl.textContent = "角落按钮已被没收。";
+
