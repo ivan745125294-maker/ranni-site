@@ -4,19 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ranni宝宝起床啦</title>
+
   <style>
     :root{
-      --bg1:#fff7fb;
-      --bg2:#eaf7ff;
-      --ink:#222;
-      --muted:#666;
-      --card:#ffffffd6;
-      --border:#00000014;
-      --shadow:0 12px 30px rgba(0,0,0,.10);
+      /* 梦幻紫主题 */
+      --bgA:#0b0620;
+      --bgB:#1a0f3a;
+      --bgC:#7c3aed;
+      --bgD:#d8b4fe;
+      --bgE:#f5e9ff;
+
+      --ink:#1b1530;
+      --muted:#6b5a95;
+      --card: rgba(255,255,255,.86);
+      --border: rgba(255,255,255,.22);
+      --shadow: 0 18px 44px rgba(20, 8, 60, .22);
       --r:20px;
-      --accent:#ff5aa5;
+
+      --accent:#a78bfa;
+      --accent2:#fb7185;
     }
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC","Microsoft Yahei", Arial;
@@ -27,33 +36,39 @@
       justify-content:center;
       padding:18px;
       background:
-        radial-gradient(900px 520px at 15% 10%, var(--bg1), transparent 60%),
-        radial-gradient(900px 520px at 90% 20%, var(--bg2), transparent 60%),
-        linear-gradient(180deg,#fff,#f7fbff);
+        radial-gradient(980px 560px at 12% 10%, var(--bgE), transparent 62%),
+        radial-gradient(980px 560px at 92% 18%, var(--bgD), transparent 62%),
+        radial-gradient(900px 520px at 55% 96%, rgba(124,58,237,.42), transparent 62%),
+        radial-gradient(700px 420px at 50% 40%, rgba(251,113,133,.16), transparent 60%),
+        linear-gradient(180deg, var(--bgA), var(--bgB));
     }
+
     .wrap{width:min(980px, 100%)}
     .top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom:12px;
-      flex-wrap:wrap;
+      margin-bottom:12px; flex-wrap:wrap;
     }
     .pill{
       padding:8px 12px;
-      border:1px solid var(--border);
-      background:#fff;
+      border:1px solid rgba(255,255,255,.26);
+      background: rgba(255,255,255,.78);
       border-radius:999px;
       font-size:13px;
       color:var(--muted);
-      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+      box-shadow: 0 10px 26px rgba(20,8,60,.16);
       user-select:none;
+      backdrop-filter: blur(8px);
     }
+
     .card{
       background:var(--card);
-      border:1px solid var(--border);
+      border:1px solid rgba(255,255,255,.24);
       border-radius:var(--r);
       box-shadow:var(--shadow);
       overflow:hidden;
+      backdrop-filter: blur(10px);
     }
+
     .main{
       display:grid;
       grid-template-columns: 380px 1fr;
@@ -62,35 +77,36 @@
     }
     @media (max-width: 900px){ .main{grid-template-columns:1fr} }
 
-    /* 左侧：贴纸区（稳定版：不会因为太大而“炸”） */
+    /* 左侧贴纸 */
     .sticker{
       width:100%;
       aspect-ratio: 1 / 1;
       border-radius:22px;
-      border:1px solid var(--border);
-      background: radial-gradient(240px 240px at 28% 20%, #fff, #f2fbff);
-      box-shadow: 0 12px 28px rgba(0,0,0,.08);
+      border:1px solid rgba(255,255,255,.22);
+      background:
+        radial-gradient(240px 240px at 28% 20%, rgba(255,255,255,.95), rgba(245,233,255,.92));
+      box-shadow: 0 18px 42px rgba(20,8,60,.18);
       position:relative;
       overflow:hidden;
     }
     .st-bubble{
       position:absolute; top:14px; left:14px;
-      background:#fff;
-      border:1px solid var(--border);
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(255,255,255,.24);
       border-radius:16px;
       padding:10px 12px;
       font-weight:900;
-      box-shadow: 0 8px 18px rgba(0,0,0,.07);
+      box-shadow: 0 12px 26px rgba(20,8,60,.14);
       white-space:pre-line;
       max-width:80%;
-      z-index:2;
+      z-index:3;
     }
     .chars{
       position:absolute; inset:0;
       display:flex;
       align-items:flex-end;
       justify-content:space-around;
-      padding:64px 16px 16px; /* 确保不会顶到气泡 */
+      padding:64px 16px 16px;
       gap:12px;
       z-index:1;
     }
@@ -98,34 +114,45 @@
       width:48%;
       height:78%;
       border-radius:22px;
-      border:1px solid var(--border);
-      background:#fff;
+      border:1px solid rgba(255,255,255,.24);
+      background: rgba(255,255,255,.82);
       display:flex;
       align-items:center;
       justify-content:center;
       position:relative;
-      overflow:hidden; /* 防止图片撑爆 */
+      overflow:hidden;
     }
     .stImg{
       width:100%;
       height:100%;
       object-fit:contain;
-      /* 先不缩放，确保“必显示”。你想更大再加 scale */
-      transform:none;
+      transform: scale(1.16);
+      transform-origin:center bottom;
       pointer-events:none;
+      display:block;
     }
-    /* 如果你确认能显示了，再把下面这行解除注释来放大一点：
-    .stImg{ transform: scale(1.18); transform-origin:center bottom; }
-    */
-
     .tag{
       position:absolute; bottom:10px; left:50%;
       transform:translateX(-50%);
       font-size:12px; color:var(--muted);
-      background:#ffffffd9; border:1px solid var(--border);
+      background: rgba(255,255,255,.88);
+      border:1px solid rgba(255,255,255,.24);
       border-radius:999px; padding:6px 10px;
-      z-index:3;
+      z-index:4;
     }
+    .imgfail::before{
+      content:"贴纸没加载到：确认 hachi.webp / usagi.webp 在仓库根目录（大小写一致）";
+      position:absolute;
+      inset:auto 10px 44px 10px;
+      text-align:center;
+      font-size:12px;
+      color: rgba(27,21,48,.60);
+      background: rgba(255,255,255,.60);
+      border:1px dashed rgba(255,255,255,.35);
+      border-radius:12px;
+      padding:10px;
+    }
+
     .shake{animation: shake .28s ease-in-out 1}
     @keyframes shake{
       0%{transform:translateX(0)}
@@ -135,62 +162,52 @@
       100%{transform:translateX(0)}
     }
 
-    /* 右侧：流程对话 */
+    /* 右侧 */
     .panel{
       border-radius:18px;
-      border:1px solid var(--border);
-      background:#ffffffb3;
+      border:1px solid rgba(255,255,255,.24);
+      background: rgba(255,255,255,.72);
       padding:14px;
       min-height:380px;
       position:relative;
       overflow:hidden;
+      backdrop-filter: blur(10px);
     }
-    .title{
-      margin:0 0 6px;
-      font-size:22px;
-      font-weight:950;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin:0 0 14px;
-      color:var(--muted);
-      line-height:1.6;
-      font-size:14px;
-    }
+    .title{margin:0 0 6px; font-size:22px; font-weight:950; letter-spacing:.2px;}
+    .sub{margin:0 0 14px; color:var(--muted); line-height:1.6; font-size:14px;}
+
     .dialog{
-      border:1px solid var(--border);
-      background:#fff;
+      border:1px solid rgba(255,255,255,.26);
+      background: rgba(255,255,255,.92);
       border-radius:16px;
       padding:12px 12px;
       line-height:1.7;
-      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+      box-shadow: 0 10px 24px rgba(20,8,60,.14);
       white-space:pre-line;
     }
-    .options{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
+    .options{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+
     button{
-      border:1px solid var(--border);
-      background:#fff;
+      border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.86);
       border-radius:14px;
       padding:12px 14px;
       font-size:14px;
       cursor:pointer;
-      box-shadow: 0 6px 16px rgba(0,0,0,.06);
-      transition: transform .08s ease, box-shadow .2s ease;
+      box-shadow: 0 10px 24px rgba(20,8,60,.14);
+      transition: transform .08s ease, box-shadow .2s ease, filter .2s ease;
+      color: var(--ink);
+      backdrop-filter: blur(8px);
     }
-    button:hover{box-shadow:0 10px 24px rgba(0,0,0,.10)}
+    button:hover{box-shadow:0 14px 34px rgba(20,8,60,.22); filter: brightness(1.02);}
     button:active{transform:translateY(1px) scale(.99)}
     .primary{
-      background: linear-gradient(180deg,#fff,#f1fbff);
-      border-color:#00000010;
+      border-color: rgba(124,58,237,.34);
+      background: linear-gradient(180deg, rgba(167,139,250,.26), rgba(255,255,255,.92));
     }
     .danger{
-      border-color:#ff000022;
-      background: linear-gradient(180deg,#fff,#fff3f6);
+      border-color: rgba(251,113,133,.32);
+      background: linear-gradient(180deg, rgba(251,113,133,.18), rgba(255,255,255,.92));
     }
     .tiny-corner{
       position:absolute;
@@ -199,7 +216,7 @@
       font-size:12px;
       padding:8px 10px;
       border-radius:999px;
-      opacity:.85;
+      opacity:.9;
     }
 
     .flash{
@@ -208,8 +225,8 @@
       text-align:center;
       font-weight:950;
       letter-spacing:.5px;
-      color:var(--accent);
-      text-shadow: 0 6px 22px rgba(255,90,165,.35);
+      color: var(--accent);
+      text-shadow: 0 10px 30px rgba(167,139,250,.55);
       animation: pop 0.35s ease-out 1, blink 1.1s ease-in-out infinite;
       pointer-events:none;
       padding:0 12px;
@@ -219,10 +236,10 @@
 
     .audioBox{
       margin-top:12px;
-      border:1px dashed var(--border);
+      border:1px dashed rgba(255,255,255,.28);
       border-radius:14px;
       padding:12px;
-      background:#ffffffcc;
+      background: rgba(255,255,255,.70);
       color:var(--muted);
       font-size:13px;
       line-height:1.6;
@@ -231,17 +248,19 @@
 
     .footer{
       padding:12px 14px;
-      border-top:1px solid var(--border);
-      background:#ffffffb3;
+      border-top:1px solid rgba(255,255,255,.20);
+      background: rgba(255,255,255,.66);
       color:var(--muted);
       font-size:12px;
       display:flex;
       gap:10px;
       justify-content:space-between;
       flex-wrap:wrap;
+      backdrop-filter: blur(10px);
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
@@ -257,14 +276,13 @@
             <div class="st-bubble" id="stBubble">Ranni宝宝～起床了吗？\n（小八：我来问！）</div>
 
             <div class="chars">
-              <div class="c">
-                <!-- ✅ 注意：文件必须在仓库 assets/ 里，且大小写一致 -->
-                <img class="stImg" src="hachi.webp?v=2" alt="小八" loading="lazy">
+              <div class="c" id="cardHachi">
+                <img class="stImg" id="imgHachi" alt="小八">
                 <div class="tag">小八</div>
               </div>
 
-              <div class="c" style="background:#fff7ef">
-                <img class="stImg" src="usagi.webp?v=2" alt="乌萨奇" loading="lazy">
+              <div class="c" id="cardUsagi" style="background: rgba(255,247,239,.85);">
+                <img class="stImg" id="imgUsagi" alt="乌萨奇">
                 <div class="tag">乌萨奇</div>
               </div>
             </div>
@@ -291,18 +309,24 @@
   </div>
 
 <script>
-  const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1474108439499112661/vf-Roj8DNsZB7RoFwy9b_abDwLPhY1XYdQ9WKUlEN1jTLoo_dHu-CsCWXJlk8GGW16qh";   // 粘贴你的 Discord Webhook URL
-  const MY_DISCORD_ID = "ivanxuuu";         // 你的用户ID（纯数字），用于@你
-  const PING_MODE = "me";           // "me" / "here" / "everyone"
-  
-  // 可选：Webhook（不用就留空）
-  const NOTIFY_URL = "https://discord.com/api/webhooks/1474108439499112661/vf-Roj8DNsZB7RoFwy9b_abDwLPhY1XYdQ9WKUlEN1jTLoo_dHu-CsCWXJlk8GGW16qh";
-  // 赖床音频（不用就留空）
-  const SWIM_AUDIO_URL = "swim.mp3";
-  // 复制消息 + 尝试打开微信
+  /** =========================
+   *  配置区（你只改这里）
+   *  ========================= */
   const SOURCE_NAME = "源";
-  const WECHAT_OPEN_SCHEME = "weixin://";
 
+  // ✅ 音乐：你仓库根目录文件名就是 swim.mp3（你截图里有）
+  const SWIM_AUDIO_URL = "swim.mp3";
+
+  // ✅ Discord Webhook：把新建的 webhook URL 粘贴到这里（别再发出来）
+  const DISCORD_WEBHOOK_URL = ""; // 例：https://discord.com/api/webhooks/xxx/yyy
+
+  // ✅ @你：填你的 Discord 用户数字 ID（Developer Mode → Copy User ID）
+  const MY_DISCORD_ID = ""; // 例：123456789012345678
+  const PING_MODE = "me";   // "me" / "here" / "everyone"
+
+  /** =========================
+   *  工具
+   *  ========================= */
   const $ = (s)=>document.querySelector(s);
   const sticker = $("#sticker");
   const stBubble = $("#stBubble");
@@ -326,6 +350,27 @@
     const d = new Date();
     return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
   }
+
+  function basePath(){
+    const p = location.pathname;
+    return p.endsWith("/") ? p : p.slice(0, p.lastIndexOf("/") + 1);
+  }
+
+  function setStickerImgs(){
+    const v = Date.now(); // 防缓存（微信有效）
+    const base = basePath();
+
+    const imgH = $("#imgHachi");
+    const imgU = $("#imgUsagi");
+
+    imgH.src = base + "hachi.webp?v=" + v;
+    imgU.src = base + "usagi.webp?v=" + v;
+
+    imgH.onerror = () => $("#cardHachi").classList.add("imgfail");
+    imgU.onerror = () => $("#cardUsagi").classList.add("imgfail");
+  }
+  setStickerImgs();
+
   function shake(){
     sticker.classList.remove("shake");
     void sticker.offsetWidth;
@@ -347,6 +392,7 @@
     optionsEl.innerHTML = "";
     cornerEl.innerHTML = "";
   }
+
   async function copyToClipboard(text){
     try{
       await navigator.clipboard.writeText(text);
@@ -362,64 +408,69 @@
     }
   }
 
+  function openDiscord(){
+    try{ window.location.href = "discord://"; }catch(e){}
+    setTimeout(()=>{ try{ window.open("https://discord.com/channels/@me", "_blank"); }catch(e){} }, 1200);
+  }
+
   async function notifyDiscord(level){
-  if(!DISCORD_WEBHOOK_URL) return false;
+    if(!DISCORD_WEBHOOK_URL) return false;
 
-  let ping = "";
-  if(PING_MODE === "everyone") ping = "@everyone ";
-  if(PING_MODE === "here") ping = "@here ";
-  if(PING_MODE === "me" && MY_DISCORD_ID) ping = `<@${ivanxuuu}> `;
+    let ping = "";
+    if(PING_MODE === "everyone") ping = "@everyone ";
+    if(PING_MODE === "here") ping = "@here ";
+    if(PING_MODE === "me" && MY_DISCORD_ID) ping = `<@${MY_DISCORD_ID}> `;
 
-  try{
-    const res = await fetch(DISCORD_WEBHOOK_URL, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        content: `${ping}💗 Ranni点了「${level}」 @ ${hm()}`
-      })
-    });
-    return res.ok;
-  }catch(e){
-    return false;
-  }
-}
-
-  async function notifySource(level){
-    const ok = await notifyDiscord(level);
-    const payload = {
-      type: "miss_you",
-      level,
-      time: new Date().toISOString(),
-      local_time: hm(),
-      from: "Ranni site"
-    };
-
-    if(NOTIFY_URL){
-      try{
-        await fetch(NOTIFY_URL, {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify(payload)
-        });
-      }catch(e){}
+    try{
+      const res = await fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          content: `${ping}💗 Ranni点了「${level}」 @ ${hm()}`
+        })
+      });
+      return res.ok;
+    }catch(e){
+      return false;
     }
-
-    const msg = `Ranni：我${level}你了💗（${hm()}）`;
-    await copyToClipboard(msg);
-
-    try{ window.location.href = WECHAT_OPEN_SCHEME; }catch(e){}
-
-    dialogEl.textContent =
-`我收到了～💗
-现在回微信给${SOURCE_NAME}发一句就好：
-「${msg}」`;
-
-    setSticker("收到～\n（乌萨奇：哼哼）");
-    flash("💗 已收到想你");
-    clearUI();
-    optionsEl.appendChild(btn("再说一次（更想）", ()=>go("miss"), "primary"));
-    optionsEl.appendChild(btn("回到开头", ()=>go("start")));
   }
+
+  /** =========================
+   *  音频（解决“没声音”）
+   *  - iPhone/微信禁止自动播放：必须用户点击触发 play()
+   *  ========================= */
+  let swimAudio = null;
+
+  function ensureAudio(){
+    if(swimAudio) return swimAudio;
+    const base = basePath();
+    const v = Date.now();
+    swimAudio = new Audio(base + SWIM_AUDIO_URL + "?v=" + v);
+    swimAudio.preload = "auto";
+    swimAudio.loop = true;
+    return swimAudio;
+  }
+
+  async function playSwim(){
+    const a = ensureAudio();
+    try{
+      await a.play(); // 必须由点击触发才会成功
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  function stopSwim(){
+    if(!swimAudio) return;
+    try{ swimAudio.pause(); swimAudio.currentTime = 0; }catch(e){}
+  }
+
+  /** =========================
+   *  流程
+   *  ========================= */
+  let state = "start";
+  let dontWantClicks = 0;
 
   function btn(text, onClick, cls=""){
     const b = document.createElement("button");
@@ -429,15 +480,33 @@
     return b;
   }
 
-  let state = "start";
-  let dontWantClicks = 0;
+  async function notifySource(level){
+    const ok = await notifyDiscord(level);
+
+    const msg = `Ranni：我${level}你了💗（${hm()}）`;
+    await copyToClipboard(msg);
+    openDiscord();
+
+    dialogEl.textContent =
+`我收到了～💗
+现在去 Discord 或微信给${SOURCE_NAME}发一句就好：
+「${msg}」
+${DISCORD_WEBHOOK_URL ? (ok ? "\n（我这边 Discord 也收到提示了✅）" : "\n（我这边 Discord 提示没收到，先按上面那句发给我就行）") : ""}`;
+
+    setSticker("收到～\n（乌萨奇：哼哼）");
+    flash("💗 已收到想你");
+    clearUI();
+    optionsEl.appendChild(btn("再说一次（更想）", ()=>go("miss"), "primary"));
+    optionsEl.appendChild(btn("回到开头", ()=>go("start")));
+  }
 
   function render(){
     clearUI();
 
     if(state === "start"){
-      titleEl.textContent = "Ranni宝宝早安";
-      subEl.textContent = "先回答一下～";
+      stopSwim();
+      titleEl.textContent = "第一关：起床检查";
+      subEl.textContent = "乌萨奇和小八上线。";
       dialogEl.textContent = "Ranni宝宝～起床了吗？";
       setSticker("Ranni宝宝～起床了吗？\n（小八：我来问！）");
 
@@ -447,8 +516,9 @@
     }
 
     if(state === "awake"){
-      titleEl.textContent = "起床成功！";
-      subEl.textContent = "那要乖乖吃点东西～";
+      stopSwim();
+      titleEl.textContent = "第二关：吃饭确认";
+      subEl.textContent = "起床了也要照顾自己。";
       dialogEl.textContent = "好耶！那你要记得吃饭呀～";
       setSticker("起床成功！\n（乌萨奇：下一步吃饭！）");
 
@@ -458,10 +528,11 @@
     }
 
     if(state === "not_hungry"){
-      titleEl.textContent = "不饿也要乖";
-      subEl.textContent = "垫一点点就行～";
+      stopSwim();
+      titleEl.textContent = "支线：不饿也要垫一下";
+      subEl.textContent = "至少喝点水/吃两口。";
       dialogEl.textContent =
-"那就先垫一点点～\n喝水也算！\n\n然后…要不要想源呀？";
+"不饿也可以先垫一点点～\n比如：酸奶/水果/小饼干/喝水都行。\n\n那我们继续下一步：要不要想源呀？";
       setSticker("不饿也要乖。\n（小八：两口也行）");
 
       optionsEl.appendChild(btn("继续", ()=>go("miss"), "primary"));
@@ -469,41 +540,47 @@
     }
 
     if(state === "miss"){
-      titleEl.textContent = "最后一题";
-      subEl.textContent = "认真答，不许骗我。";
+      stopSwim();
+      titleEl.textContent = "第三关：想源测试";
+      subEl.textContent = "请选择你的真实想念程度（慎选）。";
       dialogEl.textContent = "那…Ranni宝宝有没有想源呀？";
       setSticker("想源测试开始！\n（乌萨奇&小八：盯——）");
 
       optionsEl.appendChild(btn("想", ()=>notifySource("想"), "primary"));
       optionsEl.appendChild(btn("特别想", ()=>notifySource("特别想"), "primary"));
 
-      const tiny = btn("一点都不想", ()=>handleDontWant(), "tiny-corner danger");
-      cornerEl.appendChild(tiny);
+      cornerEl.appendChild(btn("一点都不想", ()=>handleDontWant(), "tiny-corner danger"));
       return;
     }
 
     if(state === "sleep_in"){
-      titleEl.textContent = "赖床许可";
-      subEl.textContent = "那我们游一会儿～";
+      titleEl.textContent = "赖床线：游一会儿";
+      subEl.textContent = "点一下按钮才会有声音（iPhone/微信规定）。";
       dialogEl.textContent = "那我们游一会儿~ 记得一会回来哦。";
       setSticker("赖床许可通过。\n（小八：游一会儿！）");
 
       const box = document.createElement("div");
       box.className = "audioBox";
+      box.innerHTML =
+`<b>《Swim》播放区</b><br/>
+微信/ iPhone 不允许自动播放，需要你点“开始游”才会响。<br/>
+如果还是没声音：检查手机是否静音 + 音量条。`;
 
-      if(SWIM_AUDIO_URL){
-        box.innerHTML = `<b>那我们游一会儿～</b><br/>点播放就开始游。`;
-        const audio = document.createElement("audio");
-        audio.controls = true;
-        audio.preload = "none";
-        audio.src = SWIM_AUDIO_URL;
-        box.appendChild(audio);
-      }else{
-        box.innerHTML = `<b>那我们游一会儿～</b><br/>（先不放歌也可以～你赖一会儿也行。）`;
-      }
+      const startBtn = btn("开始游（点我出声）", async ()=>{
+        const ok = await playSwim();
+        flash(ok ? "开始游～" : "没播放成功：检查静音/音量");
+      }, "primary");
+
+      const stopBtn = btn("暂停", ()=>{
+        stopSwim();
+        flash("暂停啦");
+      });
+
+      box.appendChild(startBtn);
+      box.appendChild(stopBtn);
 
       optionsEl.appendChild(box);
-      optionsEl.appendChild(btn("我回来啦（继续）", ()=>go("start"), "primary"));
+      optionsEl.appendChild(btn("我回来啦（继续流程）", ()=>go("start"), "primary"));
       return;
     }
   }
@@ -511,13 +588,13 @@
   function handleDontWant(){
     dontWantClicks += 1;
     if(dontWantClicks === 1){
-      flash("真～的不想？");
+      flash("真不想吗？");
       setSticker("嗯？\n（乌萨奇：你再说一次？）");
     }else if(dontWantClicks === 2){
-      flash("不行！这句不许选");
+      flash("那种事情不要啊");
       setSticker("不可以！\n（小八：摇头）");
     }else{
-      flash("按钮没收😤 必须想");
+      flash("必须想！！！");
       setSticker("必须想！！\n（乌萨奇：封印按钮）");
       state = "forced_miss";
       renderForcedMiss();
@@ -525,10 +602,11 @@
   }
 
   function renderForcedMiss(){
+    stopSwim();
     clearUI();
-    titleEl.textContent = "不许";
-    subEl.textContent = "角落按钮已被没收。";
-    dialogEl.textContent = "必须想！现在选一个：";
+    titleEl.textContent = "强制关：必须想";
+    subEl.textContent = "角落按钮已被封印。";
+    dialogEl.textContent = "不许！必须想！现在选一个：";
     optionsEl.appendChild(btn("想", ()=>notifySource("想"), "primary"));
     optionsEl.appendChild(btn("特别想", ()=>notifySource("特别想"), "primary"));
   }
@@ -542,5 +620,4 @@
 </script>
 </body>
 </html>
-
 
