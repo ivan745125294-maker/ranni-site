@@ -16,7 +16,6 @@
       --ink:#1b1530;
       --muted:#6b5a95;
       --card: rgba(255,255,255,.86);
-      --border: rgba(255,255,255,.22);
       --shadow: 0 18px 44px rgba(20, 8, 60, .22);
       --r:20px;
 
@@ -24,6 +23,7 @@
       --accent2:#fb7185;
       --warn:#f59e0b;
     }
+
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -239,6 +239,7 @@
       background: rgba(255,255,255,.74);
       border-radius:16px;
       padding:12px;
+      width:100%;
     }
     .row{
       display:flex;
@@ -274,6 +275,7 @@
       padding:14px;
       position:relative;
       overflow:hidden;
+      width:100%;
     }
     .badge{
       font-size:12px;
@@ -313,6 +315,7 @@
       color:var(--muted);
       font-size:13px;
       line-height:1.6;
+      width:100%;
     }
     audio{width:100%; margin-top:8px;}
 
@@ -357,18 +360,6 @@
               </div>
             </div>
           </div>
-
-          <div class="mini" id="progressBox">
-            <div class="row">
-              <div class="k">💠 心意进度</div>
-              <div class="v"><span id="progNum">0</span> / 888</div>
-            </div>
-            <div class="bar"><i id="progBar"></i></div>
-            <div class="row" style="margin-top:10px">
-              <div class="k">🎁 实物礼物</div>
-              <div class="v" id="giftState">未解锁</div>
-            </div>
-          </div>
         </div>
 
         <div class="panel" id="panel">
@@ -380,12 +371,25 @@
 
           <div id="corner"></div>
           <div id="flashHost"></div>
+
+          <!-- 礼物进度放到最下面（手机先看到互动） -->
+          <div class="mini" id="progressBottom" style="margin-top:14px;">
+            <div class="row">
+              <div class="k">💠 心意进度</div>
+              <div class="v"><span id="progNum">0</span> / 888</div>
+            </div>
+            <div class="bar"><i id="progBar"></i></div>
+            <div class="row" style="margin-top:10px">
+              <div class="k">🎁 实物礼物</div>
+              <div class="v" id="giftState">未解锁</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="footer">
-        <div>提示：今天只抽一次投喂券就够啦～</div>
-        <div id="dailyCare">💜 —</div>
+        <div>💜 <span id="dailyCare">—</span></div>
+        <div>— 源</div>
       </div>
     </div>
   </div>
@@ -396,19 +400,19 @@
    *  ========================= */
   const SOURCE_NAME = "源";
 
-  // Discord Webhook：你自己在本地粘贴（不要公开发出来）
-  const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1474108439499112661/vf-Roj8DNsZB7RoFwy9b_abDwLPhY1XYdQ9WKUlEN1jTLoo_dHu-CsCWXJlk8GGW16qh";
+  // Discord Webhook：你自己粘贴到这里（不要公开）
+  const DISCORD_WEBHOOK_URL = "";
 
-  // @你（可选）：Developer Mode → Copy User ID（纯数字）
-  const MY_DISCORD_ID = "ivanxuuu";
+  // @你（可选）：Discord 打开 Developer Mode → 右键你自己 → Copy User ID（纯数字）
+  const MY_DISCORD_ID = "";
   const PING_MODE = "me"; // "me" / "here" / "everyone"
 
-  // 赖床音乐：强烈建议用 m4a（iPhone/微信兼容更好）
+  // 赖床音乐：建议用 m4a（iPhone/微信更兼容）
   // 放到仓库根目录：swim.m4a
   const SWIM_AUDIO_URL = "swim.m4a";
 
   /** =========================
-   *  每日一句关心话（低防御）
+   *  每日文案池（低防御关心）
    *  ========================= */
   const CARE_LINES = [
     "今天不需要证明什么，舒服一点就好。",
@@ -421,6 +425,34 @@
     "哪怕只是起床了，也算完成一件很厉害的事。",
     "如果烦，就先呼吸三次，我们再继续。",
     "你不需要答对什么，来这里就已经够乖了。"
+  ];
+
+  // 第二关（投喂券）用的：起床后关心句（每天不同）
+  const WAKE_CARE_LINES = [
+    "起床了就很棒啦，慢慢来，我在这边陪着你。",
+    "今天不用解释任何事，先把自己抱紧一点点。",
+    "醒来第一件事：对自己温柔一下，剩下交给我们。",
+    "你只要点一下就好，其他都不用说。",
+    "今天不做完美宝宝，做被爱宝宝就行。",
+    "如果心里有一点点乱，也没关系，我们一起把它放轻。",
+    "醒来的你就是最可爱的你。",
+    "今天的你也值得被好好照顾。",
+    "先别急着面对世界，先让我抱抱你。",
+    "你来这里就算打卡成功：我已经在意你了。"
+  ];
+
+  // 赖床线：每天一个对女生身体好的小建议/小知识（轻量、非医疗诊断）
+  const GIRL_HEALTH_TIPS = [
+    "小建议：起床前先伸展 30 秒（脖子/肩背），会舒服很多。",
+    "小建议：今天记得喝点温水，不需要多，一口一口就好。",
+    "小建议：如果久坐，记得每小时站起来走 1 分钟，腰会谢谢你。",
+    "小建议：出门记得防晒（脸+脖子），是最省心的护肤。",
+    "小建议：觉得冷就给小肚子热敷一下，整个人会软下来。",
+    "小建议：别空腹猛喝咖啡，先垫两口更友好。",
+    "小建议：睡前把手机亮度调低一点，入睡会更轻松。",
+    "小建议：呼吸 4 秒吸气 + 6 秒呼气，重复 5 次，心会慢下来。",
+    "小建议：补一点蛋白质（奶/蛋/豆制品）更顶饿更稳。",
+    "小建议：今天给自己一个“慢一点”的许可，不用硬撑。"
   ];
 
   /** =========================
@@ -467,12 +499,17 @@
   }
   setStickerImgs();
 
-  function dailyIndex(){
+  function dailyIndex(len, salt=0){
+    // 同一天固定：用日期做 seed
     const d = new Date();
-    const seed = (d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate());
-    return seed % CARE_LINES.length;
+    const seed = (d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate() + salt);
+    return seed % len;
   }
-  $("#dailyCare").textContent = `💜 ${CARE_LINES[dailyIndex()]}`;
+  $("#dailyCare").textContent = CARE_LINES[dailyIndex(CARE_LINES.length, 0)];
+
+  function pickDaily(arr, salt=0){
+    return arr[dailyIndex(arr.length, salt)];
+  }
 
   function shake(){
     sticker.classList.remove("shake");
@@ -553,20 +590,20 @@
   /** =========================
    *  心意系统（抽卡 + 888 解锁）
    *  ========================= */
-  const STORAGE_KEY = "ranni_gacha_v3";
+  const STORAGE_KEY = "ranni_gacha_v4";
   const TARGET = 888;
 
   // ===== 测试用：URL 一键重置 =====
-  // 用法：在网址后面加 ?reset=1
+  // 用法：网址后面加 ?reset=1
   (function handleReset(){
     const params = new URLSearchParams(location.search);
     if(params.get("reset") === "1"){
       try{
+        localStorage.removeItem("ranni_gacha_v4");
         localStorage.removeItem("ranni_gacha_v3");
         localStorage.removeItem("ranni_gacha_v2");
         localStorage.removeItem("ranni_gacha_v1");
       }catch(e){}
-      // 去掉 reset 参数，避免每次都重置
       location.replace(location.pathname + "?v=" + Date.now());
     }
   })();
@@ -615,7 +652,7 @@
 
   function rollRarity(pity){
     // 概率：N 70% / R 22% / SR 7% / UR 1%
-    // 保底：连续 10 次没出 SR/UR → 下次至少 SR
+    // 保底：连续 10 次没出 SR/UR → 下次至少 SR（仍可能 UR）
     if(pity >= 10){
       const r = Math.random();
       return (r < 0.12) ? "UR" : "SR";
@@ -744,16 +781,16 @@
     }
 
     if(state === "sleep_in"){
-      titleEl.textContent = "赖床线：游一会儿";
-      subEl.textContent = "微信/iPhone 需要你点一下才会出声。";
+      titleEl.textContent = "赖床的宝宝有歌听";
+      subEl.textContent = "那我们游一会儿~ 记得一会回来哦。";
       dialogEl.textContent = "那我们游一会儿~ 记得一会回来哦。";
-      setSticker("赖床许可通过。\n（乌萨奇：别逞强）");
+      setSticker("赖床许可通过。\n（乌萨奇：再软一会）");
 
       const box = document.createElement("div");
       box.className = "audioBox";
-      box.innerHTML = `<b>《Swim》播放区</b><br/>
-      如果点了没声音：检查 iPhone 静音拨片 + 音量。<br/>
-      （建议用 <code>swim.m4a</code>，比 mp3 更兼容）`;
+      const tip = pickDaily(GIRL_HEALTH_TIPS, 7);
+      box.innerHTML = `<b>🎧 《Swim》播放区</b><br/>
+      <span style="font-weight:800">今日小建议：</span>${tip}`;
 
       const startBtn = btn("开始游（点我播放）", async ()=>{
         const ok = await playSwim();
@@ -783,10 +820,32 @@
     if(state === "awake"){
       stopSwim();
       titleEl.textContent = "第二关：投喂券";
-      subEl.textContent = "不问细节，只给你一个小小的投喂仪式。";
+      subEl.textContent = "今天只抽一次就够啦。";
+      const wakeCare = pickDaily(WAKE_CARE_LINES, 3);
+
       dialogEl.textContent =
-"起床成功！🎉\n小八：要不要领今天的投喂券？（每天 1 次）\n\n你不需要回答“吃什么/在干嘛”，只要点一下就行。";
+`起床成功！🎉
+小八：要不要领今天的投喂券？（每天 1 次）
+
+${wakeCare}`;
       setSticker("起床成功！\n（小八：投喂券时间！）");
+
+      // 概率说明（含当前保底计数）
+      const prob = document.createElement("div");
+      prob.className = "mini";
+      prob.innerHTML =
+        `<div class="k">🎲 抽卡概率说明</div>
+         <div class="v" style="margin-top:6px; white-space:pre-line; font-weight:700;">
+N 普通：70%
+R 稀有：22%
+SR 超稀有：7%
+UR 传说：1%
+
+保底：连续 10 次未出 SR/UR → 下一次至少 SR（且仍可能出 UR）
+当前保底计数：${data.pity || 0} / 10
+（每天仅 1 次投喂券）
+         </div>`;
+      optionsEl.appendChild(prob);
 
       if(canDrawToday()){
         optionsEl.appendChild(btn("领投喂券（抽一张）", async ()=>{
@@ -797,7 +856,10 @@
           setSticker("叮！抽卡成功！\n（乌萨奇：让我看看…）");
 
           clearUI();
-          dialogEl.textContent = "今日投喂券已使用 ✅\n（不问你吃什么，只希望你被照顾到。）";
+          // 重新把概率说明也放回（抽完之后也能看到）
+          optionsEl.appendChild(prob);
+
+          dialogEl.textContent = "今日投喂券已使用 ✅\n（不问你什么，只希望你被照顾到。）";
           optionsEl.appendChild(renderGachaCard(res.card, res.gain, res.after));
 
           if(res.justUnlocked){
